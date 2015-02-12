@@ -316,7 +316,20 @@ def code_gen_field(index, field_desc, env):
         context('.default_value = %s\n' % default_value)
 
     if field_desc.HasField('type_name'):
-        type_name = env.get_ref_name(field_desc.type_name).upper().replace('.', '_')
+        ##################################################
+        # by gy
+        # type_name = env.get_ref_name(field_desc.type_name).upper().replace('.', '')
+        type_name = env.get_ref_name(field_desc.type_name)
+        type_name_arr = type_name.split('.')
+        type_name_arr_len = len(type_name_arr)
+        if type_name_arr_len == 1:
+            type_name = type_name_arr[0].upper()
+        else:
+            if type_name_arr[0] == '':
+                type_name = type_name_arr[1].upper()
+            else:
+                type_name = type_name_arr[0]+'.'+type_name_arr[1].upper()
+        ##################################################
         if field_desc.type == FDP.TYPE_MESSAGE:
             context('.message_type = %s\n' % type_name)
         else:
@@ -338,7 +351,11 @@ def code_gen_message(message_descriptor, env, containing_type = None):
     full_name = env.get_local_name()
     obj_name = full_name.upper().replace('.', '_')
     env.descriptor.append(
-        "local %s = protobuf.Descriptor();\n"% obj_name
+        ##################################################
+        # by gy
+        # "local %s = protobuf.Descriptor();\n"% obj_name
+        "%s = protobuf.Descriptor();\n"% obj_name
+        ##################################################
     )
 
     context = Writer(obj_name)
